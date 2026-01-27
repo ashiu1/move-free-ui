@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 
 interface Exercise {
   description: string;
-  timestamp: string; // format: hh:mm:ss-hh:mm:ss
+  timestamp: string; // format: mm:ss-mm:ss
   name_of_exercise: string;
 }
 
@@ -19,17 +19,17 @@ declare global {
   }
 }
 
-// Convert hh:mm:ss to seconds
+// Convert mm:ss to seconds
 function timeToSeconds(timeStr: string): number {
   const parts = timeStr.split(':').map(Number);
-  if (parts.length === 3) {
-    const [hours, minutes, seconds] = parts;
-    return hours * 3600 + minutes * 60 + seconds;
+  if (parts.length === 2) {
+    const [minutes, seconds] = parts;
+    return minutes * 60 + seconds;
   }
   return 0;
 }
 
-// Parse timestamp range (hh:mm:ss-hh:mm:ss) to start and end seconds
+// Parse timestamp range (mm:ss-mm:ss) to start and end seconds
 function parseTimestampRange(timestamp: string): { start: number; end: number } {
   const [startTime, endTime] = timestamp.split('-');
   return {
@@ -67,9 +67,9 @@ function ExerciseEditorCards({ exercises, videoUrl }: ExerciseEditorCardsProps) 
 
     function initializePlayers() {
       exercises.forEach((exercise, index) => {
-        const { start, end } = parseTimestampRange(exercise.timestamp);
+        const { start } = parseTimestampRange(exercise.timestamp);
+        console.log(start)
         const playerId = `player-${index}`;
-        let hasStarted = false;
 
         if (window.YT && window.YT.Player) {
           const player = new window.YT.Player(playerId, {
@@ -80,54 +80,7 @@ function ExerciseEditorCards({ exercises, videoUrl }: ExerciseEditorCardsProps) 
               autoplay: 0,
               controls: 1,
               modestbranding: 1,
-            },
-            events: {
-              onReady: () => {
-                // When player is ready, cue to the start time
-                player.cueVideoById({
-                  videoId: videoId,
-                  startSeconds: start
-                });
-              },
-              onStateChange: (event: any) => {
-                // When video is playing, check if we've reached the end time
-                if (event.data === window.YT.PlayerState.PLAYING) {
-                  // If this is the first play and we're not at the start time, seek to it
-                  if (!hasStarted) {
-                    const currentTime = player.getCurrentTime();
-                    if (currentTime < start || currentTime >= end) {
-                      player.seekTo(start, true);
-                    }
-                    hasStarted = true;
-                  }
-
-                  // Clear any existing interval for this player
-                  if (intervalsRef.current[index]) {
-                    clearInterval(intervalsRef.current[index]!);
-                  }
-
-                  // Create new interval to check playback position
-                  intervalsRef.current[index] = setInterval(() => {
-                    const currentTime = player.getCurrentTime();
-                    // Check if we've passed or reached the end time
-                    if (currentTime >= end || currentTime < start) {
-                      player.seekTo(start, true);
-                    }
-                  }, 100);
-                } else {
-                  // Clear interval when not playing (paused, ended, buffering, etc.)
-                  if (intervalsRef.current[index]) {
-                    clearInterval(intervalsRef.current[index]!);
-                    intervalsRef.current[index] = null;
-                  }
-
-                  // Reset hasStarted when video is paused or stopped
-                  if (event.data === window.YT.PlayerState.PAUSED ||
-                      event.data === window.YT.PlayerState.ENDED) {
-                    hasStarted = false;
-                  }
-                }
-              }
+              start: start,
             }
           });
 

@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom';
-import { usePostFitnessVideo, useExerciseData } from './api/ExerciseReactQuery.ts';
+import { usePostFitnessVideo, useExerciseData } from '../api/ExerciseReactQuery.ts';
 import ExerciseEditorCards from './ExerciseEditorCards.tsx';
 
 // Extract YouTube video ID from URL
