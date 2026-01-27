@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 interface Exercise {
   description: string;
   timestamp: string; // format: mm:ss-mm:ss
-  name_of_exercise: string;
+  name: string;
 }
 
 interface ExerciseEditorCardsProps {
@@ -124,7 +124,7 @@ function ExerciseEditorCards({ exercises, videoUrl }: ExerciseEditorCardsProps) 
               backgroundColor: '#f9f9f9'
             }}
           >
-            <h3 style={{ marginTop: 0 }}>{exercise.name_of_exercise}</h3>
+            <h3 style={{ marginTop: 0 }}>{exercise.name}</h3>
 
             <div style={{ marginBottom: '12px' }}>
               <div
@@ -132,9 +132,10 @@ function ExerciseEditorCards({ exercises, videoUrl }: ExerciseEditorCardsProps) 
                 style={{ borderRadius: '4px', overflow: 'hidden' }}
               ></div>
             </div>
-
+            
             <p><strong>Timestamp:</strong> {exercise.timestamp}</p>
             <p><strong>Description:</strong> {exercise.description}</p>
+            
           </div>
         );
       })}
